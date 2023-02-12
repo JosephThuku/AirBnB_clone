@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test suite for BaseModel module
 """
-from models import base_model
+
 from models.base_model import BaseModel
 import unittest
 import uuid
