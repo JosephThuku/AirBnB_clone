@@ -33,7 +33,7 @@ class BaseModel:
         """returns a string representation  of the class
         """
 
-        return (f"{__class__.__name__} {self.id}, {self.__dict__}")
+        return (f"{[__class__.__name__]}, {(self.id)}, {self.__dict__}")
 
     def save(self):
         """updates the updated_at attr
