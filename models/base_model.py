@@ -26,7 +26,7 @@ class BaseModel:
                 if key != "__class__":
                     if key in ["created_at", "updated_at"]:
                         value = \
-                            datetime.strptime(value, "%y-%m-%dt%H:%M:%S.%f")
+                            datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                     setattr(self, key, value)
 
     def __str__(self):
