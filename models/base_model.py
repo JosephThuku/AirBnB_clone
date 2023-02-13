@@ -2,9 +2,9 @@
 """A Base class with common methods/attributes
 for other classes
 """
-import models
 import uuid
 from datetime import datetime, time, date
+from models import storage
 
 
 class BaseModel:
@@ -16,36 +16,37 @@ class BaseModel:
         """constructor for class attrs id
         created_at and updated_at
         """
+
         if not kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            models.storage.save()
+            storage.new(self)
         else:
             for key, value in kwargs.items():
                 if key != "__class__":
                     if key in ["created_at", "updated_at"]:
-                        value = \
-                            datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                        value = datetime.\
+                                strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                     setattr(self, key, value)
 
     def __str__(self):
-        """returns a string representation  of the class
+        """returns a string repr of the class
         """
 
-        return (f"[{__class__.__name__}] ({self.id}) {self.__dict__}")
+        return (f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}")
 
     def save(self):
         """updates the updated_at attr
-        also calls the sav method of storage
         """
 
         self.updated_at = datetime.now()
-        models.storage.save()
+        storage.save()
 
     def to_dict(self):
         """returns a dictionary repr of the instance
         """
+
         my_dict = self.__dict__.copy()
         my_dict.update({
             "__class__": self.__class__.__name__,

@@ -1,68 +1,65 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+"""serializes and deserializes objects to
+and from json
 """
-Module for class: FileStorage
-"""
+
 import json
-from models.amenity import Amenity
-from models.base_model import BaseModel
-from models.city import City
-from models.place import Place
-from models.review import Review
-from models.state import State
-from models.user import User
 
 
 class FileStorage:
-    """
-    Class that handles the storage of json strings
+    """defined a class to serialize and
+    deserialize json
     """
 
     __file_path = "file.json"
     __objects = {}
-    classes_dict = {"BaseModel": BaseModel,
-                    "User": User,
-                    "Amenity": Amenity,
-                    "City": City,
-                    "Place": Place,
-                    "Review": Review,
-                    "State": State}
 
     def all(self):
+        """returns returns the dictionary __objects
         """
-        Returns the dictionary __objects
-        """
-        return self.__objects
+
+        return FileStorage.__objects
 
     def new(self, obj):
+        """sets in __objects the obj with key <obj class name>.id
         """
-        Sets in __objects the obj with key <obj class name>.id
-        """
-        if obj:
-            key = '{}.{}'.format(obj.__class__.__name__, obj.id)
-            self.__objects[key] = obj
+        key = f"{obj.__class__.__name__}.{obj.id}"
+        FileStorage.__objects[key] = obj
 
     def save(self):
+        """serializes __objects to the JSON file (path: __file_path)
         """
-        Serializes __objects to the JSON file (path: __file_path)
-        """
-        dictionary = {}
-        if self.__objects is not None:
-            for key, value in self.__objects.items():
-                dictionary[key] = value.to_dict()
-        with open(self.__file_path, mode="w", encoding="utf-8") as file:
-            json.dump(dictionary, file)
+        with open(FileStorage.__file_path, "w", encoding="utf-8") as f:
+            my_dict = {}
+            for key, value in FileStorage.__objects.items():
+                my_dict[key] = value.to_dict()
+            json.dump(my_dict, f)
 
     def reload(self):
+        """deserializes from a json file
         """
-        Deserializes the JSON file to __objects
-        (only if the JSON file exists)
-        """
+        from models.base_model import BaseModel
+        from models.user import User
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.place import Place
+        from models.review import Review
 
+        class_dict = {
+                "BaseModel": BaseModel,
+                "User": User,
+                "State": State,
+                "City": City,
+                "Amenity": Amenity,
+                "Place": Place,
+                "Review": Review
+                }
+        obj = FileStorage.__objects
         try:
-            with open(self.__file_path, mode="r", encoding="utf-8") as file:
-                temp_objects = json.load(file)
-            for key, value in temp_objects.items():
-                self.__objects[key] = \
-                    self.classes_dict[value['__class__']](**value)
+            with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
+                json_data = json.load(f)
+                for key, value in json_data.items():
+                    obj[key] = class_dict[value["__class__"]](**value)
         except FileNotFoundError:
             pass
